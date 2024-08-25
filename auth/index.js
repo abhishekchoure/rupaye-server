@@ -18,7 +18,7 @@ authRouter.post("/signup", async (req, res) => {
     !req.body.hasOwnProperty("email") ||
     !req.body.hasOwnProperty("password")
   ) {
-    res.status(501).json({
+    res.status(400).json({
       error: "Incomplete user details for signup process",
     });
     return;
@@ -30,8 +30,8 @@ authRouter.post("/signup", async (req, res) => {
   const doesUserAlreadyExist = await checkIfUserAlreadyExist(email);
 
   if (doesUserAlreadyExist) {
-    res.status(501).json({
-      error: "Your Email ID already exist with an another account",
+    res.status(400).json({
+      error: "Email ID already exist with an account",
     });
     return;
   }
@@ -47,7 +47,7 @@ authRouter.post("/signup", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(501).json({
+    res.status(500).json({
       error: "Error signing up. Try again later ...",
     });
   }
@@ -67,7 +67,7 @@ authRouter.post("/login", async (req, res) => {
     !req.body.hasOwnProperty("email") ||
     !req.body.hasOwnProperty("password")
   ) {
-    res.status(501).json({
+    res.status(400).json({
       error: "Incomplete user details for login process",
     });
     return;
@@ -80,7 +80,7 @@ authRouter.post("/login", async (req, res) => {
 
   // Verify Email ID
   if (user === null) {
-    res.status(200).json({
+    res.status(400).json({
       error: "Email ID is incorrect. If you are new, first create your account",
     });
     return;
@@ -89,20 +89,18 @@ authRouter.post("/login", async (req, res) => {
   // Verify Password
   const passwordMatch = await compare(password, user.password);
   if (!passwordMatch) {
-    res.status(200).json({
+    res.status(400).json({
       error: "Password is incorrect",
     });
     return;
   }
 
-  // Set secure cookie session
   res.cookie(
     "user",
-    { id: user.id, name: user.name, email: user.email },
+    JSON.stringify({ id: user.id, name: user.name, email: user.email }),
     {
-      maxAge: 100 * 60 * 30,
+      maxAge: 100 * 60 * 30 * 5,
       httpOnly: true,
-      secure: true,
     }
   );
 
@@ -112,17 +110,8 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout", (req, res) => {
-  res.cookie(
-    "user",
-    {},
-    {
-      maxAge: 0,
-      httpOnly: true,
-      secure: true,
-    }
-  );
-
-  res.json({
+  res.clearCookie("user");
+  res.status(200).json({
     message: "Logout successfull",
   });
 });
