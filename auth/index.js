@@ -116,4 +116,15 @@ authRouter.post("/logout", (req, res) => {
   });
 });
 
+authRouter.get("/user", (req, res) => {
+  if (req.cookies.user) {
+    res.status(200).json({
+      user: req.cookies.user,
+    });
+    return;
+  }
+
+  res.status(401).send()
+});
+
 export default authRouter;

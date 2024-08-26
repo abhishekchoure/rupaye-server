@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 
 const PORT = process.env.PORT || 3000;
 import authRouter from "./auth/index.js";
+import categoriesRouter from "./data/categories/index.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+app.use("/categories", categoriesRouter);
 
 app.listen(PORT, () => {
   console.log(`rupaye-server listening on port ${PORT}`);
