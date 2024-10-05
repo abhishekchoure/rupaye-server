@@ -1,6 +1,6 @@
 import express from "express";
 import { nanoid } from "nanoid";
-import { createUserCategory, getUserCategories } from "../categories/utils.js";
+import { createUserCategory, getUserCategories, getUserMonthlyBudget} from "../categories/utils.js";
 import { userCookieCheck } from "../../middleware/cookie.js";
 const categoriesRouter = express.Router();
 
@@ -17,6 +17,20 @@ categoriesRouter.get("/", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error getting categories of a user" });
+  }
+});
+
+categoriesRouter.get("/budget", async (req, res) => {
+  const userCookie = JSON.parse(req.cookies.user);
+
+  try {
+    const budget = await getUserMonthlyBudget(userCookie.id);
+    res.status(200).json({
+      budget,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error getting budget for user" });
   }
 });
 

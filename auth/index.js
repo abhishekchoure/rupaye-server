@@ -99,7 +99,7 @@ authRouter.post("/login", async (req, res) => {
     "user",
     JSON.stringify({ id: user.id, name: user.name, email: user.email }),
     {
-      maxAge:  100 * 60 * 30,
+      maxAge:  1000 * 60 * 60 * 30,
       httpOnly: true,
     }
   );
