@@ -40,3 +40,21 @@ export const getUserTransactionsByMonth = async (userId, month) => {
   return result.rows;
 };
 
+
+export const getUserLastFiveMonthsBudget = async (userId) => {
+  const result = await turso.execute({
+    sql: `
+      SELECT strftime('%Y-%m', created_at) AS month, SUM(amount) AS total_amount
+      FROM transactions
+      WHERE user_id = ?
+      AND created_at >= DATE('now', 'start of month', '-5 months')
+      AND created_at < DATE('now', 'start of month', '+1 month')
+      GROUP BY month
+      ORDER BY month;
+    `,
+    args: [userId]
+  });
+
+  return result.rows;
+
+}
